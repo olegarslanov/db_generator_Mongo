@@ -5,9 +5,10 @@
 # then value is number (float, int) which is random number from a(min) to b(max) )
 # *number o documents to create.
 
-from pymongo import MongoClient
-from typing import Dict
+
 import random
+from typing import Dict
+from pymongo import MongoClient
 import pandas as pd
 
 
@@ -36,11 +37,22 @@ def populate_database():
 
     field_names = []
     field_types = []
+    min_values = []
+    max_values = []
+
     for _ in range(field_quant):
         field_name = input("Please enter the field name: ")
         field_type = input("Please enter the field type (string, number, date): ")
+        if field_type == "number":
+            min_value = float(input("Please enter the minimum value: "))
+            max_value = float(input("Please enter the maximum value: "))
+        else:
+            min_value = None
+            max_value = None
         field_names.append(field_name)
         field_types.append(field_type)
+        min_values.append(min_value)
+        max_values.append(max_value)
 
     for _ in range(doc_quant):
         document = {}
@@ -50,9 +62,7 @@ def populate_database():
             if field_type == "string":
                 value = "".join(random.choices("abcdefghijklmnopqrstuvwxyz", k=10))
             elif field_type == "number":
-                min_value = float(input("Please enter the minimum value: "))
-                max_value = float(input("Please enter the maximum value: "))
-                value = random.uniform(min_value, max_value)
+                value = random_number(min_values[i], max_values[i])
             elif field_type == "date":
                 value = random_date()
             else:
@@ -63,6 +73,11 @@ def populate_database():
         document_manager.create_document(document)
 
     print("Database population completed.")
+
+
+def random_number(min_value, max_value):
+    number_value = round(random.uniform(min_value, max_value), 0)
+    return number_value
 
 
 def random_date(start_date="2020-01-01", end_date="2023-12-31"):
